@@ -680,7 +680,7 @@ PARTICIPANTS.forEach((p, i) => {
 });
 
 // ── STATE ────────────────────────────────────────────────────────
-let API_KEY = '9b03a0775439457b9fc2679d32fa3cfb';
+let API_KEY = '';
 let teamStatus = {}; // team name → {status:'alive'|'eliminated'|'winner', points:N, stage:'group'|'r32'|'r16'|'qf'|'sf'|'final'|'winner'}
 let matches = [];
 let dataLoaded = false;
@@ -931,15 +931,12 @@ function renderSettings() {
 
 // ── API FETCH ────────────────────────────────────────────────────
 async function fetchLiveData() {
-  if (!API_KEY) { loadDemoData(); return; }
+  // if (!API_KEY) { loadDemoData(); return; }
 
   try {
     document.getElementById('update-time').textContent = 'Refreshing…';
     // Football-data.org WC2026 competition ID
-    const r = await fetch('https://api.football-data.org/v4/competitions/WC/matches?season=2026', {
-      headers: { 'X-Auth-Token': API_KEY }
-    });
-
+   const r = await fetch('https://wc2026-api.oyediran.workers.dev/matches');
     if (!r.ok) {
       if (r.status === 403 || r.status === 401) {
         document.getElementById('update-time').textContent = 'Invalid API key — using demo data';
@@ -947,9 +944,7 @@ async function fetchLiveData() {
       }
       if (r.status === 404) {
         // Try without season param (competition may not be live yet in their system)
-        const r2 = await fetch('https://api.football-data.org/v4/competitions/WC/matches', {
-          headers: { 'X-Auth-Token': API_KEY }
-        });
+       const r2 = await fetch('https://wc2026-api.oyediran.workers.dev/matches');
         if (!r2.ok) { loadDemoData(); return; }
         return processApiResponse(await r2.json());
       }
